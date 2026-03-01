@@ -1,11 +1,11 @@
 package com.vitaliy.trails;
 
-import net.minecraft.client.network.play.NetworkPlayerInfo;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.particles.RedstoneParticleData;
+import net.minecraft.particles.ParticleTypes;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -13,67 +13,36 @@ import net.minecraftforge.fml.common.Mod;
 public class ClientEvents {
 
     @SubscribeEvent
-    public static void onClientTick(TickEvent.ClientTickEvent event) {
-
-        if (event.phase != TickEvent.Phase.END) return;
+    public static void onRenderWorld(RenderWorldLastEvent event) {
 
         Minecraft mc = Minecraft.getInstance();
-        if (mc.level == null) return;
+
+        if (mc.player == null || mc.level == null) return;
 
         for (PlayerEntity player : mc.level.players()) {
 
-    NetworkPlayerInfo info = mc.getConnection().getPlayerInfo(player.getUUID());
-    if (info == null) continue;
+            // Только если игрок движется
+            if (player.getDeltaMovement().lengthSqr() < 0.001) continue;
 
-    String brand = info.getModelName(); // используем как маркер
+            double x = player.getX();
+            double y = player.getY() + 0.1;
+            double z = player.getZ();
 
-    if (brand == null || !brand.contains("streamertrails")) {
-        continue;
-    } {
+            // Определяем ширину
+            boolean isVitaly = player.getName().getString().equalsIgnoreCase("Vitaly_Sokolov");
 
-    if (!PlayerTracker.hasMod(player.getUUID())) continue; {
+            double spread = isVitaly ? 0.2 : 0.1;
 
-            if (!player.isAlive()) continue;
-if (player.getUUID().equals(mc.player.getUUID())) {
-    // ты всегда видишь себя
-}
-            // Проверяем горизонтальное движение
-            double motionX = player.getDeltaMovement().x;
-            double motionZ = player.getDeltaMovement().z;
-
-            double horizontalSpeed = motionX * motionX + motionZ * motionZ;
-
-            // Если почти не движется — пропускаем
-            if (horizontalSpeed < 0.0005) continue;
-
-            float size = 1.0F;
-            double spread = 0.2; // В 2 раза уже (было 0.4)
-
-            // Твой ник — шире и больше
-            if (player.getName().getString().equals("Vitaly_Sokolov")) {
-                size = 1.8F;
-                spread = 0.35; // шире остальных
-            }
-
-            float r = ModConfigHolder.RED.get().floatValue();
-            float g = ModConfigHolder.GREEN.get().floatValue();
-            float b = ModConfigHolder.BLUE.get().floatValue();
-
-            for (int i = 0; i < 3; i++) {
-
-                double offsetX = (mc.level.random.nextDouble() - 0.5) * spread;
-                double offsetZ = (mc.level.random.nextDouble() - 0.5) * spread;
-
-                mc.level.addParticle(
-                        new RedstoneParticleData(r, g, b, size),
-                        player.getX() + offsetX,
-                        player.getY() + 0.05,
-                        player.getZ() + offsetZ,
-                        0, 0, 0
-                );
-            }
+            // Пурпурные частицы
+            mc.level.addParticle(
+                    ParticleTypes.PORTAL,
+                    x + (mc.level.random.nextDouble() - 0.5) * spread,
+                    y,
+                    z + (mc.level.random.nextDouble() - 0.5) * spread,
+                    0,
+                    0.01,
+                    0
+            );
         }
     }
 }
-
-
