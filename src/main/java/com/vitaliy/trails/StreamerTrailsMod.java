@@ -8,11 +8,12 @@ NetworkHandler.register();
 public class StreamerTrailsMod {
 
     public StreamerTrailsMod() {
-
+NetworkHandler.register();
         ModLoadingContext.get().registerConfig(
                 ModConfig.Type.CLIENT,
                 ModConfigHolder.SPEC
         );
     }
 }
+
 
