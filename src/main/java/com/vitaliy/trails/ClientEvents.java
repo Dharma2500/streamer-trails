@@ -1,5 +1,6 @@
 package com.vitaliy.trails;
 
+import net.minecraft.client.network.play.NetworkPlayerInfo;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.particles.RedstoneParticleData;
@@ -20,6 +21,15 @@ public class ClientEvents {
         if (mc.level == null) return;
 
         for (PlayerEntity player : mc.level.players()) {
+
+    NetworkPlayerInfo info = mc.getConnection().getPlayerInfo(player.getUUID());
+    if (info == null) continue;
+
+    String brand = info.getModelName(); // используем как маркер
+
+    if (brand == null || !brand.contains("streamertrails")) {
+        continue;
+    } {
 
     if (!PlayerTracker.hasMod(player.getUUID())) continue; {
 
@@ -65,4 +75,5 @@ if (player.getUUID().equals(mc.player.getUUID())) {
         }
     }
 }
+
 
