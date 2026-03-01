@@ -6,35 +6,45 @@ import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-@Mod.EventBusSubscriber(value = Dist.CLIENT)
-public class ClientEvents {
+@SubscribeEvent
+public static void onClientTick(TickEvent.ClientTickEvent event) {
 
-    @SubscribeEvent
-    public static void onClientTick(TickEvent.ClientTickEvent event) {
+    if (event.phase != TickEvent.Phase.END) return;
 
-        if (event.phase != TickEvent.Phase.END) return;
+    Minecraft mc = Minecraft.getInstance();
+    if (mc.level == null) return;
 
-        Minecraft mc = Minecraft.getInstance();
-        if (mc.level == null) return;
+    for (PlayerEntity player : mc.level.players()) {
 
-        for (PlayerEntity player : mc.level.players()) {
+        if (!player.isAlive()) continue;
 
-            if (!player.isAlive()) continue;
+        // Проверяем движение
+        if (player.getDeltaMovement().lengthSqr() < 0.001) continue;
 
-            float size = 1.0F; // обычный размер
+        float size = 1.0F;
 
-            // Проверка на твой ник
-            if (player.getName().getString().equals("Vitaly_Sokolov")) {
-                size = 1.6F; // твой след больше
-            }
+        if (player.getName().getString().equals("Vitaly_Sokolov")) {
+            size = 1.8F;
+        }
+
+        float r = ModConfig.RED.get().floatValue();
+        float g = ModConfig.GREEN.get().floatValue();
+        float b = ModConfig.BLUE.get().floatValue();
+
+        // Создаем красивый шлейф из нескольких частиц
+        for (int i = 0; i < 4; i++) {
+
+            double offsetX = (mc.level.random.nextDouble() - 0.5) * 0.4;
+            double offsetZ = (mc.level.random.nextDouble() - 0.5) * 0.4;
 
             mc.level.addParticle(
-                    new RedstoneParticleData(0.8F, 0.0F, 1.0F, size), // пурпур
-                    player.getX(),
+                    new RedstoneParticleData(r, g, b, size),
+                    player.getX() + offsetX,
                     player.getY() + 0.1,
-                    player.getZ(),
+                    player.getZ() + offsetZ,
                     0, 0, 0
             );
         }
     }
 }
+
