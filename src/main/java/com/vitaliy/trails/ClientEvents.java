@@ -1,32 +1,35 @@
-package com.vitaliy.trails;
-
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.world.World;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.particles.RedstoneParticleData;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-@Mod.EventBusSubscriber(modid = "streamertrails", value = Dist.CLIENT)
+@Mod.EventBusSubscriber(value = Dist.CLIENT)
 public class ClientEvents {
 
     @SubscribeEvent
-    public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
+    public static void onClientTick(TickEvent.ClientTickEvent event) {
 
         if (event.phase != TickEvent.Phase.END) return;
 
-        PlayerEntity player = event.player;
-        World world = player.level; // official mapping
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.level == null) return;
 
-        if (!world.isClientSide) return;
+        for (PlayerEntity player : mc.level.players()) {
 
-        Vector3d motion = player.getDeltaMovement(); // official mapping
+            if (!player.isAlive()) continue;
 
-        if (motion.length() > 0.05) {
+            float size = 1.0F; // обычный размер
 
-            world.addParticle(
-                    net.minecraft.particles.ParticleTypes.END_ROD,
+            // Проверка на твой ник
+            if (player.getName().getString().equals("Vitaly_Sokolov")) {
+                size = 1.6F; // твой след больше
+            }
+
+            mc.level.addParticle(
+                    new RedstoneParticleData(0.8F, 0.0F, 1.0F, size), // пурпур
                     player.getX(),
                     player.getY() + 0.1,
                     player.getZ(),
