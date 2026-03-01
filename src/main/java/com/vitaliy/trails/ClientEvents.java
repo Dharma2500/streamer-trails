@@ -21,8 +21,12 @@ public class ClientEvents {
 
         for (PlayerEntity player : mc.level.players()) {
 
-            if (!player.isAlive()) continue;
+    if (!PlayerTracker.hasMod(player.getUUID())) continue; {
 
+            if (!player.isAlive()) continue;
+if (player.getUUID().equals(mc.player.getUUID())) {
+    // ты всегда видишь себя
+}
             // Проверяем горизонтальное движение
             double motionX = player.getDeltaMovement().x;
             double motionZ = player.getDeltaMovement().z;
@@ -61,3 +65,4 @@ public class ClientEvents {
         }
     }
 }
+
