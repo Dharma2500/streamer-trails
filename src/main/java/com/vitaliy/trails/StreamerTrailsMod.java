@@ -6,9 +6,10 @@ import net.minecraftforge.fml.ModLoadingContext;
 
 ModLoadingContext.get().registerConfig(
         net.minecraftforge.fml.config.ModConfig.Type.CLIENT,
-        твой_пакет.ModConfig.SPEC
+        StreamerTrails.ModConfig.SPEC
 );
 @Mod("streamertrails")
 public class StreamerTrailsMod {
 
 }
+
